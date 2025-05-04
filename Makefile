@@ -1,33 +1,16 @@
-all: all-release
+ACLOCAL_AMFLAGS = -I build-aux/m4
+SUBDIRS = src
+if ENABLE_MAN
+SUBDIRS += doc/man
+endif
+.PHONY: deploy FORCE
 
-cmake-debug:
-	mkdir -p build/debug
-	cd build/debug && cmake -D CMAKE_BUILD_TYPE=Debug ../..
+GZIP_ENV="-9n"
 
-build-debug: cmake-debug
-	cd build/debug && $(MAKE)
+if BUILD_BLOCKDAGCOIN_LIBS
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libblockdagcoinconsensus.pc
+endif
 
-test-debug: build-debug
-	cd build/debug && $(MAKE) test
-
-all-debug: build-debug
-
-cmake-release:
-	mkdir -p build/release
-	cd build/release && cmake -D CMAKE_BUILD_TYPE=Release ../..
-
-build-release: cmake-release
-	cd build/release && $(MAKE)
-
-test-release: build-release
-	cd build/release && $(MAKE) test
-
-all-release: build-release
-
-clean:
-	rm -rf build
-
-tags:
-	ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ src contrib tests/gtest
-
-.PHONY: all cmake-debug build-debug test-debug all-debug cmake-release build-release test-release all-release clean tags
+BLOCKDAGCOIND_BIN=$(top_builddir)/src/$(BLOCKDAGCOIN_DAEMON_NAME)$(EXEEXT)
+BLOCKDAGCOIN_QT_BIN=$(top_builddir)/src/qt/$(BLOCKDAGCOIN_GUI_NAME)$(EXEEXT)
